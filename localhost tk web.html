@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localhost - Find a host for every journey</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#e6fbf7',
+                            100: '#c0f5eb',
+                            500: '#00c29a',
+                            600: '#00a382',
+                            700: '#00856b',
+                        },
+                        dark: '#1e293b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .bg-auth-pattern {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .bg-hero-pattern {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- APP HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" onclick="navigateTo('home')" class="flex items-center gap-1 text-2xl font-bold tracking-tight text-slate-900 group">
+                <span>loc<span class="text-brand-500">a</span>lhost</span>
+                <span class="w-2 h-2 rounded-full bg-brand-500 inline-block transition-transform group-hover:scale-125"></span>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <button onclick="navigateTo('home')" id="nav-home" class="hover:text-brand-500 transition-colors text-slate-900 font-semibold">Home</button>
+                <button onclick="navigateTo('home')" id="nav-stays" class="hover:text-brand-500 transition-colors">Stays</button>
+                <a href="#become-host" onclick="showToast('Feature available soon!')" class="hover:text-brand-500 transition-colors">Become a host</a>
+            </nav>
+
+            <!-- User Actions / Profile -->
+            <div class="flex items-center gap-4">
+                <button onclick="showToast('No new notifications')" class="p-2.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors relative" title="Notifications">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-brand-500 rounded-full"></span>
+                </button>
+                
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+                <!-- Unauthenticated State -->
+                <div id="auth-buttons" class="flex items-center gap-3">
+                    <button onclick="navigateTo('signin')" class="text-sm font-medium text-slate-700 hover:text-brand-500 px-3 py-2 transition-colors">Sign in</button>
+                    <button onclick="navigateTo('signup')" class="text-sm font-medium bg-brand-500 text-white px-4 py-2 rounded-xl hover:bg-brand-600 transition-all shadow-sm shadow-brand-500/20 active:scale-95">Sign up</button>
+                </div>
+
+                <!-- Authenticated Avatar State (Hidden by default) -->
+                <div id="user-avatar" class="hidden flex items-center gap-3 cursor-pointer group relative" onclick="toggleUserDropdown()">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-brand-500/30">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 hidden sm:inline">Michelle W.</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main id="app-content" class="flex-grow">
+        <!-- Dynamic Views will be rendered here -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-16 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Support</h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Help Centre</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">AirCover</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Combating discrimination</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Supporting people with disabilities</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Cancellation options</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Report neighbourhood concern</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Hosting</h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Localhome</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Cover for hosts</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Hosting resources</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Community forum</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Hosting responsibly</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Localhost</h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Newsroom</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">New Features</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Careers</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Investors</a></li>
+                        <li><a href="#" class="hover:underline hover:text-slate-700">Gift cards</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p>© 2026 Localhost, Inc. All Rights Reserved</p>
+                <div class="flex items-center gap-6">
+                    <a href="#" class="hover:underline hover:text-slate-700">Privacy Policy</a>
+                    <a href="#" class="hover:underline hover:text-slate-700">Terms & Conditions</a>
+                    <a href="#" class="hover:underline hover:text-slate-700">Contact us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 opacity-0 transform translate-y-10 pointer-events-none z-50 flex items-center gap-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-brand-500"></i>
+        <span id="toast-message" class="text-sm font-medium">Notification message</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // MOCK DATA FOR PROPERTIES
+        const PROPERTIES = [
+            {
+                id: 1,
+                title: "Brightwoods Cabin",
+                location: "Bridlepath, Ontario, Canada",
+                shortLocation: "Ontario, Canada",
+                price: 658,
+                rating: 5.0,
+                reviewsCount: 200,
+                image: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?auto=format&fit=crop&w=800&q=80",
+                badge: "Best time to Book",
+                isFav: false,
+                gallery: [
+                    "https://images.unsplash.com/photo-1587061949409-02df41d5e562?auto=format&fit=crop&w=1200&q=80",
+                    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80"
+                ]
+            },
+            {
+                id: 2,
+                title: "Urban Loft",
+                location: "Georgian Bay, Ontario, Canada",
+                shortLocation: "Georgian Bay, Canada",
+                price: 410,
+                rating: 4.5,
+                reviewsCount: 88,
+                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 3,
+                title: "Forestville Cottages",
+                location: "Simcoe, Ontario, Canada",
+                shortLocation: "Simcoe, Canada",
+                price: 325,
+                rating: 5.0,
+                reviewsCount: 142,
+                image: "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 4,
+                title: "Unionville Lodge",
+                location: "Markham, Ontario, Canada",
+                shortLocation: "Markham, Canada",
+                price: 485,
+                rating: 4.8,
+                reviewsCount: 96,
+                image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
+                badge: "Price chart",
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 5,
+                title: "Mississauga Airstream",
+                location: "Mississauga, Ontario, Canada",
+                shortLocation: "Mississauga, Canada",
+                price: 502,
+                rating: 4.8,
+                reviewsCount: 54,
+                image: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80",
+                badge: "Price chart",
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 6,
+                title: "Niagara Homes",
+                location: "Niagara, Ontario, Canada",
+                shortLocation: "Niagara, Canada",
+                price: 655,
+                rating: 4.9,
+                reviewsCount: 210,
+                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 7,
+                title: "Sunny Estate",
+                location: "Barrie, Ontario, Canada",
+                shortLocation: "Barrie, Canada",
+                price: 320,
+                rating: 5.0,
+                reviewsCount: 65,
+                image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+                badge: "Price chart",
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 8,
+                title: "Lawrence Hills",
+                location: "Lawrence, Ontario, Canada",
+                shortLocation: "Lawrence, Canada",
+                price: 350,
+                rating: 5.0,
+                reviewsCount: 112,
+                image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 9,
+                title: "Simcoe Lake Lodge",
+                location: "Simcoe, Ontario, Canada",
+                shortLocation: "Simcoe, Canada",
+                price: 395,
+                rating: 5.0,
+                reviewsCount: 78,
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 10,
+                title: "Wasaga Beach Home",
+                location: "Georgian Bay, Ontario, Canada",
+                shortLocation: "Georgian Bay, Canada",
+                price: 385,
+                rating: 5.0,
+                reviewsCount: 154,
+                image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
+                badge: "Price chart",
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 11,
+                title: "Banff Hills",
+                location: "Banff, Alberta, Canada",
+                shortLocation: "Banff, Canada",
+                price: 385,
+                rating: 5.0,
+                reviewsCount: 92,
+                image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
+                badge: "Price chart",
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80"]
+            },
+            {
+                id: 12,
+                title: "Creemore Canada",
+                location: "Creemore, Ontario, Canada",
+                shortLocation: "Creemore, Canada",
+                price: 385,
+                rating: 5.0,
+                reviewsCount: 44,
+                image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+                badge: null,
+                isFav: false,
+                gallery: ["https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80"]
+            }
+        ];
+
+        // STATE MANAGEMENT
+        let currentView = 'home';
+        let selectedProperty = PROPERTIES[0];
+        let favoriteIds = new Set();
+        let isLoggedIn = false;
+
+        // ROUTER / NAVIGATION FUNCTION
+        function navigateTo(view, propertyId = null) {
+            currentView = view;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (propertyId) {
+                selectedProperty = PROPERTIES.find(p => p.id === propertyId) || PROPERTIES[0];
+            }
+
+            renderApp();
+        }
+
+        // TOGGLE FAVORITE
+        function toggleFavorite(id, event) {
+            if (event) event.stopPropagation();
+            if (favoriteIds.has(id)) {
+                favoriteIds.delete(id);
+                showToast("Removed from saved list");
+            } else {
+                favoriteIds.add(id);
+                showToast("Saved to favorites!");
+            }
+            renderApp();
+        }
+
+        // SHOW TOAST NOTIFICATION
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            
+            toast.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // RENDER HOMEPAGE VIEW
+        function renderHome() {
+            return `
+                <!-- HERO SECTION -->
+                <section class="bg-hero-pattern relative text-white py-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center">
+                    <div class="max-w-4xl mx-auto text-center mb-10">
+                        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 drop-shadow-md">
+                            Find a <span class="text-brand-500">host</span> for every journey
+                        </h1>
+                        <p class="text-slate-200 text-base sm:text-lg max-w-2xl mx-auto drop-shadow">
+                            Discover the best local rental properties that fits your every travel needs
+                        </p>
+                    </div>
+
+                    <!-- SEARCH BAR -->
+                    <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-3 sm:p-4 text-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+                        <!-- Accommodation -->
+                        <div class="lg:col-span-4 flex items-center gap-3 px-3 py-2 border-b sm:border-b-0 sm:border-r border-slate-200">
+                            <i class="fa-solid fa-house text-slate-400 text-lg"></i>
+                            <div class="flex-1">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Accommodation</label>
+                                <input type="text" placeholder="Toronto, Canada" class="w-full text-sm font-medium text-slate-900 focus:outline-none bg-transparent" value="Toronto, Ontario">
+                            </div>
+                        </div>
+
+                        <!-- Check-in -->
+                        <div class="lg:col-span-2 flex items-center gap-3 px-3 py-2 border-b sm:border-b-0 sm:border-r border-slate-200">
+                            <i class="fa-regular fa-calendar text-slate-400 text-lg"></i>
+                            <div class="flex-1">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Check-in</label>
+                                <input type="text" placeholder="Add dates" class="w-full text-sm font-medium text-slate-900 focus:outline-none bg-transparent" value="Oct 28">
+                            </div>
+                        </div>
+
+                        <!-- Check-out -->
+                        <div class="lg:col-span-2 flex items-center gap-3 px-3 py-2 border-b sm:border-b-0 sm:border-r border-slate-200">
+                            <i class="fa-regular fa-calendar text-slate-400 text-lg"></i>
+                            <div class="flex-1">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Check-out</label>
+                                <input type="text" placeholder="Add dates" class="w-full text-sm font-medium text-slate-900 focus:outline-none bg-transparent" value="Nov 04">
+                            </div>
+                        </div>
+
+                        <!-- Guest -->
+                        <div class="lg:col-span-2 flex items-center gap-3 px-3 py-2">
+                            <i class="fa-solid fa-user-group text-slate-400 text-lg"></i>
+                            <div class="flex-1">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Guest</label>
+                                <input type="text" placeholder="Add guests" class="w-full text-sm font-medium text-slate-900 focus:outline-none bg-transparent" value="2 Guests">
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="lg:col-span-2">
+                            <button onclick="showToast('Searching top stays in Toronto...')" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-brand-500/30 active:scale-95">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span>Search</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- STAYS NEARBY SECTION -->
+                <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Stays nearby: <span class="text-slate-600 font-normal">Toronto Ontario</span></h2>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                            <button class="bg-white text-brand-600 font-semibold px-3 py-1.5 rounded-lg shadow-sm text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-grid-2"></i> Grid
+                            </button>
+                            <button onclick="showToast('Map View enabled')" class="text-slate-600 hover:text-slate-900 font-medium px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
+                                <i class="fa-regular fa-map"></i> Map
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PROPERTIES GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        ${PROPERTIES.map(item => `
+                            <div onclick="navigateTo('details', ${item.id})" class="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col">
+                                <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    
+                                    <!-- Favorite Button -->
+                                    <button onclick="toggleFavorite(${item.id}, event)" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-red-500 hover:bg-white transition-all shadow-sm">
+                                        <i class="${favoriteIds.has(item.id) ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'}"></i>
+                                    </button>
+
+                                    ${item.badge ? `
+                                        <span class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md text-emerald-700 text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                                            <i class="fa-solid fa-chart-line text-emerald-500"></i> ${item.badge}
+                                        </span>
+                                    ` : ''}
+                                </div>
+
+                                <div class="p-4 flex flex-col flex-grow justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2 mb-1">
+                                            <h3 class="font-bold text-slate-900 text-base truncate group-hover:text-brand-600 transition-colors">${item.title}</h3>
+                                            <div class="flex items-center gap-1 text-xs font-semibold text-slate-800">
+                                                <i class="fa-solid fa-star text-amber-400"></i>
+                                                <span>${item.rating.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-slate-500 mb-3 truncate">${item.shortLocation}</p>
+                                    </div>
+                                    
+                                    <div class="flex items-baseline gap-1 pt-2 border-t border-slate-100">
+                                        <span class="text-lg font-extrabold text-slate-900">$${item.price}</span>
+                                        <span class="text-xs text-slate-500">/ night</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- SHOW MORE BUTTON -->
+                    <div class="mt-12 text-center">
+                        <button onclick="showToast('Loaded all available stays!')" class="inline-flex items-center justify-center border-2 border-brand-500 text-brand-600 font-semibold px-8 py-3 rounded-xl hover:bg-brand-500 hover:text-white transition-all duration-200">
+                            Show more
+                        </button>
+                    </div>
+                </section>
+            `;
+        }
+
+        // RENDER PROPERTY DETAILS VIEW
+        function renderDetails() {
+            const p = selectedProperty;
+            const gallery = p.gallery && p.gallery.length >= 4 ? p.gallery : [
+                p.image,
+                "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80"
+            ];
+
+            return `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <!-- BREADCRUMB & BACK -->
+                    <button onclick="navigateTo('home')" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-brand-600 mb-6 font-medium transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i> Back to search
+                    </button>
+
+                    <!-- HEADER TITLE -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">${p.title}</h1>
+                            <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-600">
+                                <span><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${p.location}</span>
+                                <span>•</span>
+                                <span class="flex items-center gap-1 font-semibold text-slate-900">
+                                    <i class="fa-solid fa-star text-amber-400"></i> ${p.rating.toFixed(1)} 
+                                    <a href="#reviews" class="text-brand-600 underline font-normal ml-1">(${p.reviewsCount} reviews)</a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleFavorite(${p.id})" class="inline-flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-50 transition-colors">
+                                <i class="${favoriteIds.has(p.id) ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'}"></i>
+                                <span>${favoriteIds.has(p.id) ? 'Saved' : 'Save'}</span>
+                            </button>
+                            <button onclick="showToast('Share link copied!')" class="inline-flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-50 transition-colors">
+                                <i class="fa-solid fa-share-nodes"></i> Share
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GALLERY GRID -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 rounded-2xl overflow-hidden mb-10 relative">
+                        <!-- Main Large Image -->
+                        <div class="md:col-span-2 aspect-[4/3] bg-slate-100 overflow-hidden">
+                            <img src="${gallery[0]}" alt="Main view" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                        
+                        <!-- Grid Thumbnails -->
+                        <div class="hidden md:grid md:col-span-2 grid-cols-2 gap-3">
+                            ${gallery.slice(1, 5).map((imgUrl, i) => `
+                                <div class="aspect-[4/3] bg-slate-100 overflow-hidden relative">
+                                    <img src="${imgUrl}" alt="Gallery image ${i+1}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                    ${i === 3 ? `
+                                        <button onclick="showToast('Opening 360 Virtual Tour...')" class="absolute inset-0 bg-slate-900/40 hover:bg-slate-900/50 backdrop-blur-xs flex items-center justify-center text-white font-semibold gap-2 transition-all">
+                                            <i class="fa-solid fa-vr-cardboard text-xl"></i>
+                                            <span>360 Tour</span>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- MAIN CONTENT SPLIT -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        <!-- LEFT CONTENT (INFO, AMENITIES, REVIEWS) -->
+                        <div class="lg:col-span-2 space-y-10">
+                            
+                            <!-- ABOUT SECTION -->
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-4">About this home</h3>
+                                <p class="text-slate-600 leading-relaxed mb-4 text-sm sm:text-base">
+                                    Welcome to ${p.title}, your idyllic retreat nestled in the heart of ${p.location}! Our cozy cabin, surrounded by the tranquility of nature's embrace, is designed to provide the ultimate relaxing getaway.
+                                </p>
+                                <p class="text-slate-600 leading-relaxed text-sm sm:text-base mb-4">
+                                    <strong>Living Space:</strong> This charming property boasts a spacious living area adorned with rustic decor and modern amenities. Enjoy the warmth of the wood-burning fireplace, relax on plush sofas, and make yourself at home with our entertainment center featuring flat-screen TV, WiFi, and more.
+                                </p>
+                                <a href="#details" onclick="showToast('Full description expanded')" class="text-brand-600 font-semibold text-sm hover:underline inline-block">Show more <i class="fa-solid fa-angle-right text-xs"></i></a>
+                            </div>
+
+                            <hr class="border-slate-200">
+
+                            <!-- FEATURES HIGHLIGHTS -->
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
+                                        <i class="fa-solid fa-laptop text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-900 text-sm">Dedicated workspace</h4>
+                                        <p class="text-xs text-slate-500">A private room equipped with high-speed WiFi suitable for remote work.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
+                                        <i class="fa-solid fa-key text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-900 text-sm">Self check-in</h4>
+                                        <p class="text-xs text-slate-500">Check in easily with just your smart phone key access.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
+                                        <i class="fa-solid fa-calendar-xmark text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-900 text-sm">Free cancellation</h4>
+                                        <p class="text-xs text-slate-500">Cancel anytime prior to 48 hours before check-in for a full refund.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-200">
+
+                            <!-- AMENITIES -->
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-6">Amenities</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6 text-slate-700 text-sm">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-water text-slate-400 w-5"></i> Lakeside</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-square-parking text-slate-400 w-5"></i> Free parking</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-fire-extinguisher text-slate-400 w-5"></i> Fire Extinguisher</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-kitchen-set text-slate-400 w-5"></i> Kitchen</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-shower text-slate-400 w-5"></i> Outdoor shower</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-box text-slate-400 w-5"></i> Freezer</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-video text-slate-400 w-5"></i> Security cameras</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-temperature-arrow-up text-slate-400 w-5"></i> Hot water</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mug-saucer text-slate-400 w-5"></i> Coffee Maker</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-wifi text-slate-400 w-5"></i> Wifi</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-bottle-droplet text-slate-400 w-5"></i> Shampoo</div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-fire-burner text-slate-400 w-5"></i> Glass stove</div>
+                                </div>
+                                <button onclick="showToast('Viewing all 32 amenities')" class="mt-6 border border-slate-900 text-slate-900 font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-slate-900 hover:text-white transition-all">
+                                    Show all amenities
+                                </button>
+                            </div>
+
+                            <hr class="border-slate-200">
+
+                            <!-- MAP SECTION -->
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-slate-900">Where you'll be</h3>
+                                    <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                                        <i class="fa-solid fa-sun text-amber-500 text-sm"></i>
+                                        <span>20°C Broken clouds</span>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-slate-600 mb-4">${p.location}</p>
+                                
+                                <!-- Mock Map Display -->
+                                <div class="relative w-full h-72 bg-emerald-50 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center">
+                                    <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80" class="absolute inset-0 w-full h-full object-cover opacity-60">
+                                    
+                                    <!-- Location Pin -->
+                                    <div class="relative z-10 flex flex-col items-center">
+                                        <div class="bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-bounce">
+                                            <i class="fa-solid fa-house text-brand-500"></i> ${p.title}
+                                        </div>
+                                        <div class="w-3 h-3 bg-slate-900 rotate-45 -mt-1.5"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-200">
+
+                            <!-- REVIEWS SECTION -->
+                            <div id="reviews">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold text-slate-900">Reviews</h3>
+                                    <a href="#" onclick="showToast('Showing all reviews')" class="text-brand-600 font-semibold text-sm hover:underline">View all</a>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <!-- Review 1 -->
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover">
+                                                <div>
+                                                    <h5 class="font-bold text-slate-900 text-sm">Johnny Cash</h5>
+                                                    <p class="text-[11px] text-slate-400">June 2023</p>
+                                                </div>
+                                                <div class="ml-auto text-xs font-bold text-slate-900 flex items-center gap-1">
+                                                    <span>5.0</span> <i class="fa-solid fa-star text-amber-400"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-600 leading-relaxed">
+                                                Michelle's place was so great and definitely the perfect place for our long weekend. The lake is amazing!
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review 2 -->
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover">
+                                                <div>
+                                                    <h5 class="font-bold text-slate-900 text-sm">Yuta Watanabe</h5>
+                                                    <p class="text-[11px] text-slate-400">May 2023</p>
+                                                </div>
+                                                <div class="ml-auto text-xs font-bold text-slate-900 flex items-center gap-1">
+                                                    <span>4.5</span> <i class="fa-solid fa-star text-amber-400"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-600 leading-relaxed">
+                                                The location is perfect. I love the lake so much!! This is one of the best stays we had for a while.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review 3 -->
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover">
+                                                <div>
+                                                    <h5 class="font-bold text-slate-900 text-sm">Shane Willis</h5>
+                                                    <p class="text-[11px] text-slate-400">December 2022</p>
+                                                </div>
+                                                <div class="ml-auto text-xs font-bold text-slate-900 flex items-center gap-1">
+                                                    <span>4.8</span> <i class="fa-solid fa-star text-amber-400"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-600 leading-relaxed">
+                                                A great place overall. One of the nicest places in town for sure. I will come back in the next few months!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT SIDEBAR (BOOKING CARD) -->
+                        <div class="lg:col-span-1">
+                            <div class="sticky top-28 bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-6">
+                                <div class="flex items-baseline justify-between">
+                                    <div>
+                                        <span class="text-3xl font-extrabold text-slate-900">$${p.price}</span>
+                                        <span class="text-sm text-slate-500">/ night</span>
+                                    </div>
+                                    <span class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-100">
+                                        Best time to Book
+                                    </span>
+                                </div>
+
+                                <!-- Booking Dates Widget -->
+                                <div class="border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-200 text-xs">
+                                    <div class="grid grid-cols-2 divide-x divide-slate-200">
+                                        <div class="p-3">
+                                            <label class="block font-bold uppercase text-[10px] text-slate-400">Check-in</label>
+                                            <input type="text" value="10/28/2026" class="w-full font-medium text-slate-900 focus:outline-none bg-transparent">
+                                        </div>
+                                        <div class="p-3">
+                                            <label class="block font-bold uppercase text-[10px] text-slate-400">Checkout</label>
+                                            <input type="text" value="11/04/2026" class="w-full font-medium text-slate-900 focus:outline-none bg-transparent">
+                                        </div>
+                                    </div>
+                                    <div class="p-3">
+                                        <label class="block font-bold uppercase text-[10px] text-slate-400">Guests</label>
+                                        <select class="w-full font-medium text-slate-900 focus:outline-none bg-transparent cursor-pointer">
+                                            <option>2 guests</option>
+                                            <option>3 guests</option>
+                                            <option>4 guests</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button onclick="showToast('Reservation Request Sent!')" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all active:scale-95 text-base">
+                                    Book this home
+                                </button>
+
+                                <div class="text-center text-xs text-slate-400">
+                                    You won't be charged yet
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- HOST MINI PROFILE -->
+                                <div class="flex items-center gap-4 pt-2">
+                                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" alt="Host" class="w-12 h-12 rounded-full object-cover">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h5 class="font-bold text-slate-900 text-sm">Hosted by Michelle Ward</h5>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs text-slate-500">
+                                            <span class="bg-brand-50 text-brand-600 font-semibold px-2 py-0.5 rounded text-[10px]">★ Superhost</span>
+                                            <span>Joined in May 2021</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SIMILAR STAYS CAROUSEL -->
+                    <div class="mt-20 pt-10 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-bold text-slate-900">Similar stays</h3>
+                            <a href="#" onclick="navigateTo('home')" class="text-brand-600 font-semibold text-sm hover:underline">View all</a>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            ${PROPERTIES.slice(1, 4).map(item => `
+                                <div onclick="navigateTo('details', ${item.id})" class="cursor-pointer bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-slate-200 transition-all hover:shadow-lg flex flex-col group">
+                                    <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                        <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    </div>
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <h4 class="font-bold text-slate-900 text-sm truncate">${item.title}</h4>
+                                            <span class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-star text-amber-400"></i> ${item.rating}</span>
+                                        </div>
+                                        <p class="text-xs text-slate-500 mb-2 truncate">${item.shortLocation}</p>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-base font-extrabold text-slate-900">$${item.price}</span>
+                                            <span class="text-xs text-slate-500">/ night</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // RENDER AUTH VIEWS (SIGN IN & SIGN UP)
+        function renderAuth(type) {
+            const isSignIn = type === 'signin';
+            return `
+                <div class="min-h-[85vh] bg-auth-pattern flex items-center justify-center p-4 sm:p-6">
+                    <div class="bg-white/95 backdrop-blur-lg rounded-3xl p-8 sm:p-10 w-full max-w-md shadow-2xl border border-white/40 transition-all">
+                        
+                        <!-- Header -->
+                        <div class="mb-8 text-center sm:text-left">
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
+                                ${isSignIn ? 'Sign in' : 'Create Account'}
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-500">
+                                ${isSignIn ? 'Welcome back! Please enter your details.' : 'Sign up to start booking your dream stay.'}
+                            </p>
+                        </div>
+
+                        <!-- Form -->
+                        <form onsubmit="handleAuthSubmit(event, '${type}')" class="space-y-4">
+                            <div>
+                                <div class="relative">
+                                    <input type="email" required placeholder="Email address" class="w-full px-4 py-3.5 pr-11 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                                    <i class="fa-regular fa-user absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="relative">
+                                    <input type="password" required placeholder="Password" class="w-full px-4 py-3.5 pr-11 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                                    <i class="fa-solid fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                </div>
+                            </div>
+
+                            ${!isSignIn ? `
+                                <div>
+                                    <div class="relative">
+                                        <input type="password" required placeholder="Confirm password" class="w-full px-4 py-3.5 pr-11 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                                        <i class="fa-solid fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-brand-500/30 transition-all active:scale-95 text-sm mt-2">
+                                ${isSignIn ? 'Sign in' : 'Sign up'}
+                            </button>
+                        </form>
+
+                        <!-- Divider -->
+                        <div class="relative my-6 text-center">
+                            <hr class="border-slate-200">
+                            <span class="bg-white px-3 text-xs text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-medium">
+                                Or ${isSignIn ? 'sign in' : 'sign up'} with
+                            </span>
+                        </div>
+
+                        <!-- Social Login Buttons -->
+                        <div class="grid grid-cols-3 gap-3 mb-8">
+                            <button onclick="handleSocialAuth('Google')" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                                <i class="fa-brands fa-google text-red-500 text-xl mb-1"></i>
+                                <span class="text-[10px] font-medium text-slate-600">Google</span>
+                            </button>
+                            <button onclick="handleSocialAuth('Facebook')" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                                <i class="fa-brands fa-facebook text-blue-600 text-xl mb-1"></i>
+                                <span class="text-[10px] font-medium text-slate-600">Facebook</span>
+                            </button>
+                            <button onclick="handleSocialAuth('Apple')" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                                <i class="fa-brands fa-apple text-slate-900 text-xl mb-1"></i>
+                                <span class="text-[10px] font-medium text-slate-600">Apple</span>
+                            </button>
+                        </div>
+
+                        <!-- Footer Toggle Link -->
+                        <div class="text-center text-xs text-slate-600">
+                            ${isSignIn ? `
+                                Don't have an account yet? 
+                                <button onclick="navigateTo('signup')" class="text-brand-600 font-bold hover:underline">Sign up</button>
+                            ` : `
+                                I already have an account. 
+                                <button onclick="navigateTo('signin')" class="text-brand-600 font-bold hover:underline">Login</button>
+                            `}
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        // AUTH ACTIONS
+        function handleAuthSubmit(e, type) {
+            e.preventDefault();
+            isLoggedIn = true;
+            updateHeaderAuthUI();
+            showToast(type === 'signin' ? "Successfully signed in!" : "Account created successfully!");
+            navigateTo('home');
+        }
+
+        function handleSocialAuth(provider) {
+            isLoggedIn = true;
+            updateHeaderAuthUI();
+            showToast(`Signed in with ${provider}`);
+            navigateTo('home');
+        }
+
+        function updateHeaderAuthUI() {
+            const authBtns = document.getElementById('auth-buttons');
+            const userAvatar = document.getElementById('user-avatar');
+            if (isLoggedIn) {
+                authBtns.classList.add('hidden');
+                userAvatar.classList.remove('hidden');
+            } else {
+                authBtns.classList.remove('hidden');
+                userAvatar.classList.add('hidden');
+            }
+        }
+
+        function toggleUserDropdown() {
+            if (confirm("Would you like to sign out?")) {
+                isLoggedIn = false;
+                updateHeaderAuthUI();
+                showToast("Signed out successfully");
+            }
+        }
+
+        // CORE RENDER METHOD
+        function renderApp() {
+            const mainContent = document.getElementById('app-content');
+            
+            // Highlight nav links
+            const navHome = document.getElementById('nav-home');
+            const navStays = document.getElementById('nav-stays');
+
+            if (currentView === 'home') {
+                mainContent.innerHTML = renderHome();
+                navHome.classList.add('text-slate-900', 'font-semibold');
+                navStays.classList.remove('text-slate-900', 'font-semibold');
+            } else if (currentView === 'details') {
+                mainContent.innerHTML = renderDetails();
+                navHome.classList.remove('text-slate-900', 'font-semibold');
+                navStays.classList.add('text-slate-900', 'font-semibold');
+            } else if (currentView === 'signin') {
+                mainContent.innerHTML = renderAuth('signin');
+            } else if (currentView === 'signup') {
+                mainContent.innerHTML = renderAuth('signup');
+            }
+        }
+
+        // INITIAL LOAD
+        window.onload = function() {
+            renderApp();
+        };
+    </script>
+</body>
+</html>
